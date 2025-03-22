@@ -1,47 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-
-class Character {
-  final String name;
-  final String status;
-  final String species;
-
-  Character({required this.name, required this.status, required this.species});
-
-  factory Character.fromJson(Map<String, dynamic> json) {
-    return Character(
-      name: json['name'],
-      status: json['status'],
-      species: json['species'],
-    );
-  }
-}
-
-class ApiResponse {
-  final List<Character> results;
-  final ApiInfo info;
-
-  ApiResponse({required this.results, required this.info});
-
-  factory ApiResponse.fromJson(Map<String, dynamic> json) {
-    return ApiResponse(
-      results: (json['results'] as List).map((e) => Character.fromJson(e)).toList(),
-      info: ApiInfo.fromJson(json['info']),
-    );
-  }
-}
-
-class ApiInfo {
-  final String? next;
-
-  ApiInfo({required this.next});
-
-  factory ApiInfo.fromJson(Map<String, dynamic> json) {
-    return ApiInfo(
-      next: json['next'],
-    );
-  }
-}
+import 'models.dart';
+import 'api_service.dart';
 
 class CharacterScreen extends StatefulWidget {
   const CharacterScreen({super.key});
@@ -51,68 +10,50 @@ class CharacterScreen extends StatefulWidget {
 }
 
 class _CharacterScreenState extends State<CharacterScreen> {
-  final List<Character> _data = [];
-  dynamic _error;
+  final ApiService _apiService = ApiService();
+  final ScrollController _scrollController = ScrollController();
+
+  List<Character> _characters = [];
   bool _isLoading = false;
   bool _isFetchingMore = false;
   int _page = 1;
   bool _hasNextPage = true;
-
-  final Dio _dio = Dio();
-  final ScrollController _scrollController = ScrollController();
+  dynamic _error;
 
   @override
   void initState() {
     super.initState();
     _fetchData(_page);
-
-    // Add a listener to the scroll controller for infinite scroll
     _scrollController.addListener(_scrollListener);
   }
 
   @override
   void dispose() {
-    _scrollController.dispose(); // Dispose the controller to avoid memory leaks
+    _scrollController.dispose();
     super.dispose();
   }
 
   void _scrollListener() {
-    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
-      // User has reached the bottom of the list
-      if (_hasNextPage && !_isFetchingMore) {
-        _loadMore();
-      }
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent && _hasNextPage && !_isFetchingMore) {
+      _loadMore();
     }
   }
 
-  Future<void> _fetchData(int pageNumber) async {
-    if (pageNumber == 1) {
-      setState(() {
-        _isLoading = true;
-      });
-    } else {
-      setState(() {
-        _isFetchingMore = true;
-      });
-    }
+  Future<void> _fetchData(int page) async {
+    setState(() => page == 1 ? _isLoading = true : _isFetchingMore = true);
 
     try {
-      final response = await _dio.get('https://rickandmortyapi.com/api/character?page=$pageNumber');
-      final apiResponse = ApiResponse.fromJson(response.data);
-
+      final apiResponse = await _apiService.fetchCharacters(page);
       setState(() {
-        if (pageNumber == 1) {
-          _data.clear();
-          _data.addAll(apiResponse.results);
+        if (page == 1) {
+          _characters = apiResponse.results;
         } else {
-          _data.addAll(apiResponse.results);
+          _characters.addAll(apiResponse.results);
         }
         _hasNextPage = apiResponse.info.next != null;
       });
     } catch (err) {
-      setState(() {
-        _error = err is DioException ? err.response?.data ?? 'API Error' : 'Something went wrong';
-      });
+      setState(() => _error = err.toString());
     } finally {
       setState(() {
         _isLoading = false;
@@ -122,17 +63,14 @@ class _CharacterScreenState extends State<CharacterScreen> {
   }
 
   void _loadMore() {
-    if (_hasNextPage && !_isFetchingMore) {
-      setState(() {
-        _page++;
-      });
-      _fetchData(_page);
-    }
+    _fetchData(++_page);
   }
 
   void _refetch() {
     setState(() {
       _page = 1;
+      _characters.clear();
+      _error = null;
     });
     _fetchData(_page);
   }
@@ -140,26 +78,18 @@ class _CharacterScreenState extends State<CharacterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rick and Morty Characters'),
-      ),
+      appBar: AppBar(title: const Text('Rick and Morty Characters')),
       body: Column(
         children: [
-          if (_isLoading)
-            const Center(child: CircularProgressIndicator())
-          else if (_error != null)
-            Center(child: Text('Error: $_error'))
-          else
-            Expanded(
+          if (_isLoading) const Center(child: CircularProgressIndicator())
+          else if (_error != null) Center(child: Text('Error: $_error'))
+          else Expanded(
               child: ListView.builder(
-                controller: _scrollController, // Attach the scroll controller
-                itemCount: _data.length + 1, // +1 for the loading indicator
+                controller: _scrollController,
+                itemCount: _characters.length + 1,
                 itemBuilder: (context, index) {
-                  if (index == _data.length) {
-                    // Show a loading indicator at the bottom
-                    return _buildLoader();
-                  }
-                  final character = _data[index];
+                  if (index == _characters.length) return _buildLoader();
+                  final character = _characters[index];
                   return ListTile(
                     title: Text(character.name),
                     subtitle: Text('${character.status} - ${character.species}'),
