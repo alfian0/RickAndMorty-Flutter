@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:rick_and_morty/CharacterScreen.dart';
-import 'package:provider/provider.dart';
-import 'character_provider.dart';
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => CharacterProvider()),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
