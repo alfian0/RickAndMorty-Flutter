@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:rick_and_morty/CharacterScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'widgets/auth_checker.dart';
+import 'firebase/firebase_options.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -13,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Rick and Morty Characters',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: CharacterScreen(),
+      home: const AuthChecker(),
     );
   }
 }

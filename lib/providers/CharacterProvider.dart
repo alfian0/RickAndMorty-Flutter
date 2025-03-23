@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'api_service.dart';
-import 'models.dart';
+import '../services/api_service.dart';
+import '../models/models.dart';
 
 class CharacterProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();

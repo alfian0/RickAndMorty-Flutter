@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'CharacterProvider.dart';
+import '../providers/CharacterProvider.dart';
 
 class CharacterScreen extends StatelessWidget {
   final CharacterProvider _characterProvider = CharacterProvider();
