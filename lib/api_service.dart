@@ -9,7 +9,7 @@ class ApiService {
       final response = await _dio.get('https://rickandmortyapi.com/api/character?page=$page');
       return ApiResponse.fromJson(response.data);
     } catch (e) {
-      throw e is DioError ? e.response?.data ?? 'API Error' : 'Something went wrong';
+      throw e is DioException ? e.response?.data ?? 'API Error' : 'Something went wrong';
     }
   }
 }

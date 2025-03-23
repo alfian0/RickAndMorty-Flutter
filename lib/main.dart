@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Rick and Morty Characters',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const CharacterScreen(),
+      home: CharacterScreen(),
     );
   }
 }
