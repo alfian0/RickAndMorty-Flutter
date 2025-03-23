@@ -13,13 +13,13 @@ class CharacterScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Rick and Morty Characters'),
+        title: const Text('Rick and Morty Characters'),
       ),
       body: ListenableBuilder(
         listenable: _characterProvider,
         builder: (context, child) {
           if (_characterProvider.isLoading) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else if (_characterProvider.error != null) {
             return Center(child: Text('Error: ${_characterProvider.error}'));
           } else {
@@ -52,10 +52,10 @@ class CharacterScreen extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Center(
         child: characterProvider.isFetchingMore
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : characterProvider.hasNextPage
-            ? Text('Load more...')
-            : Text('No more characters to load.'),
+            ? const Text('Load more...')
+            : const Text('No more characters to load.'),
       ),
     );
   }
