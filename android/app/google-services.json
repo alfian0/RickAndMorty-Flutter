@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "430598349534",
+    "project_id": "golfapp-33b10",
+    "storage_bucket": "golfapp-33b10.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:430598349534:android:39499567d582c8ed47984f",
+        "android_client_info": {
+          "package_name": "com.example.rick_and_morty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbURs4GIw1KmMSc1zWfwY4DBAZklQKgrc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
